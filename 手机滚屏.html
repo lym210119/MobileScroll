@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="veiwport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge"> 
+	<title>Document</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+		html,body{
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+		}
+		.main {
+			width: 100%;
+			height: 100%;
+		}
+		.main div {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+		}
+		.main div img {
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+</head>
+<body>
+	<div class="main">
+		<div class="page1"><img src="images/08.jpg" alt=""></div>
+		<div class="page2"><img src="images/09.jpg" alt=""></div>
+		<div class="page3"><img src="images/10.jpg" alt=""></div>
+		<div class="page4"><img src="images/11.jpg" alt=""></div>
+		<div class="page5"><img src="images/12.jpg" alt=""></div>
+	</div>
+
+	<script>
+		window.onload = function() {
+			// 得到轮播图里面的li
+			var main = document.querySelector('.main');
+	    	var pages = document.querySelectorAll('.main div');
+	    	console.log(pages);
+	    	// 信号量
+	    	var idx = 0;
+	    	var next = 1;
+	    	var prev = pages.length - 1;
+
+	    	var windowHeight;
+
+	    	// 初始化
+	    	init();
+
+	    	function init() {
+	    		windowHeight = document.documentElement.clientHeight;
+	    		for (var i = 0; i < pages.length; i++) {
+	    			pages[i].style.webkitTransform = "translateY(" + windowHeight + "px)";
+	    		}
+
+	    		// 新的位置
+	    		pages[prev].style.webkitTransform = "translateY(" + -windowHeight + "px)";
+	    		pages[idx].style.webkitTransform = "translateY(0px)";
+	    		pages[next].style.webkitTransform = "translateY(" + windowHeight + "px)";
+
+	    		// 去掉过渡，移动的时候我们希望实时跟随鼠标，而不是有过渡效果
+	    		pages[prev].style.transition = "none";
+	    		pages[idx].style.transition = "none";
+	    		pages[next].style.transition = "none";
+
+	    	}
+
+	    	// 事件监听
+		    main.addEventListener("touchstart", touchstartHandler, false);
+		    main.addEventListener("touchmove", touchmoveHandler, false);
+		    main.addEventListener("touchend", touchendHandler, false);
+
+		    var deltaX, startX, startTime;
+		    function touchstartHandler(event) {
+		        // 阻止默认行为
+		        event.preventDefault();
+		        // 手指个数
+		        if (event.touches.length > 1) return;
+
+		        // 记录偏移值
+		        deltaY = event.touches[0].clientY;
+		        startY = event.touches[0].clientY;
+
+		        // 去掉过渡效果
+		        pages[prev].style.transition = "none";
+		        pages[idx].style.transition = "none";
+		        pages[next].style.transition = "none";
+
+
+		        // 记录时间
+		        startTime = new Date();
+		    }
+
+			// 手指移动的时候
+		    function touchmoveHandler(event) {
+		        event.preventDefault();
+		        //手指个数
+
+		        if (event.touches.length > 1) return;
+
+		        // 得到坐标X
+		        var clientY = event.touches[0].clientY;
+
+		        // 改变图片的位置
+		        pages[idx].style.webkitTransform = "translateY(" + (clientY - deltaY) + "px)";
+		        pages[next].style.webkitTransform = "translateY(" + (windowHeight + (clientY - deltaY)) + "px)";
+		        pages[prev].style.webkitTransform = "translateY(" + (-windowHeight+ (clientY - deltaY)) + "px)";
+		    }
+
+
+		    // 触摸结束事件
+		    function touchendHandler(event) {
+		    	console.log(event);
+		        event.preventDefault();
+				//判断滑动是否成功
+		        var distance = event.changedTouches[0].clientY - startY;
+		        console.log(distance);
+				//滑动的时间
+		        var time = new Date() - startTime;
+
+		        //如果你向右边滑动超过了屏幕的一半，或者向右滑动时间小于300毫秒，距离大于30px则认为滑动成功
+		        if (distance >= windowHeight / 2 || (distance > 30 && time < 300)) {
+		        	//向右滑动成功
+		        	console.log(distance);
+	          		console.log('向下滑动成功');
+	          		//先改变信号量
+
+	          		next = idx;
+	          		idx = prev;
+	          		prev--;
+	          		if (prev < 0) {
+	          			prev = pages.length - 1;
+	          		}
+
+	          		//加上过渡
+	          		pages[idx].style.transition = "all 0.3s ease 0s";
+	          		pages[next].style.transition = "all 0.3 ease 0s";
+
+	          		// 移动
+	          		pages[idx].style.webkitTransform = "translateY(0px)";
+	          		pages[next].style.webkitTransform = "translateY(" + windowHeight + "px)";
+		        } else if (distance <= -windowHeight / 2 || (distance < -30 && time < 300)) {
+		        	showNext();
+		        } else {
+		        	//绝对值不到windowWidth/2
+		        	console.log('不成功');
+
+		        	//加上过渡
+		        	pages[prev].style.transition = "all 0.3s ease 0s";
+		        	pages[idx].style.transition = "all 0.3s ease 0s";
+		        	pages[next].style.transition = "all 0.3s ease 0s";
+
+		        	// 移动
+		        	pages[prev].style.webkitTransform = "translateY(" + -windowHeight + "px)";
+		        	pages[idx].style.webkitTransform = "translateY(0px)";
+		        	pages[next].style.webkitTransform = "translateY(" + windowHeight + "px)";
+		        }
+		    }
+
+		    function showNext() {
+		    	console.log("向上滑动成功");
+		    	// 先改变信号量
+		    	prev = idx;
+		    	idx = next;
+		    	next++;
+		    	if (next > pages.length - 1) {
+		    		next = 0;
+		    	}
+
+		    	pages[prev].style.transition = "none";
+		    	pages[prev].style.webkitTransform = "translateY(" + windowHeight + "px)";
+		    	
+		    	// 加上过渡
+		    	pages[next].style.transition = "all 0.3s ease 0s";
+		    	pages[idx].style.transition = "all 0.3s ease 0s";
+		    	
+		    	// 移动
+		    	pages[next].style.webkitTransform = "translateY(" + -windowHeight + "px)";
+		    	pages[idx].style.webkitTransform = "translateY(0px)";
+
+		    }
+
+		}
+	</script>
+</body>
+</html>
