@@ -55,6 +55,7 @@
 
 	    	// 初始化
 	    	init();
+	    	window.onresize = init;
 
 	    	function init() {
 	    		windowHeight = document.documentElement.clientHeight;
@@ -62,6 +63,10 @@
 	    			pages[i].style.webkitTransform = "translateY(" + windowHeight + "px)";
 	    		}
 
+	    		// 去掉过渡，移动的时候我们希望实时跟随鼠标，而不是有过渡效果
+		    	pages[idx].style.transition = "none";
+				pages[next].style.transition = "none";
+	          	pages[prev].style.transition = "none";
 	    		// 新的位置
 	    		changepages();
 
@@ -72,7 +77,7 @@
 		    main.addEventListener("touchmove", touchmoveHandler, false);
 		    main.addEventListener("touchend", touchendHandler, false);
 
-		    var deltaX, startX, startTime;
+		    var startX, startTime;
 		    function touchstartHandler(event) {
 		        // 阻止默认行为
 		        event.preventDefault();
@@ -81,10 +86,14 @@
 
 		        // 记录偏移值
 		        startY = event.touches[0].clientY;
-
-
 		        // 记录时间
 		        startTime = new Date();
+
+		        // 去掉过渡，移动的时候我们希望实时跟随鼠标，而不是有过渡效果
+		    	pages[idx].style.transition = "none";
+				pages[next].style.transition = "none";
+	          	pages[prev].style.transition = "none";
+
 		    }
 
 			// 手指移动的时候
@@ -116,15 +125,18 @@
 		        var time = new Date() - startTime;
 
 		        //如果你向下边滑动超过了屏幕的一半，或者向下滑动时间小于300毫秒，距离大于30px则认为滑动成功
-		        if (distance >= windowHeight / 2 || (distance > 30 && time < 300)) {
+		        if (distance >= windowHeight/2 || (distance > 30 && time < 300)) {
 		        	showPrev();
-		        } else if (distance <= -windowHeight / 2 || (distance < -30 && time < 300)) {
+		        } else if (distance <= -windowHeight/2 || (distance < -30 && time < 300)) {
 		        	showNext();
 		        } else {
 		        	//绝对值不到windowHeight/2
 		        	console.log('不成功');
 
-		        	changepages();
+		        	// 移动
+			    	pages[idx].style.webkitTransform = "translateY(0px)";
+			    	pages[next].style.webkitTransform = "translateY("+ windowHeight + "px)";
+			    	pages[prev].style.webkitTransform = "translateY(" + -windowHeight + "px)";
 		        }
 		    }
 
@@ -137,7 +149,10 @@
 				if (prev < 0) {
 					prev = pages.length - 1;
 				}
-
+				// 加上过渡
+		    	pages[idx].style.transition = "all 0.3s ease 0s";
+	          	pages[next].style.transition = "all 0.3s ease 0s";
+	          	// pages[prev].style.transition = "all 0.3s ease 0s";
 				changepages();
 			}
 		    function showNext() {
@@ -150,22 +165,27 @@
 		    		next = 0;
 		    	}
 
+		    	// 加上过渡
+		    	pages[idx].style.transition = "all 0.3s ease 0s";
+				pages[prev].style.transition = "all 0.3s ease 0s";
+				// pages[next].style.transition = "all 0.3s ease 0s";
+
 		    	changepages();
 
 		    }
 
 
 		    function changepages() {
-
-		    	// 加上过渡
-		    	pages[idx].style.transition = "all 0.3s ease 0s";
-				pages[next].style.transition = "all 0.3 ease 0s";
-	          	pages[prev].style.transition = "all 0.3 ease 0s";
-
 	          	// 移动
 		    	pages[idx].style.webkitTransform = "translateY(0px)";
-		    	pages[next].style.webkitTransform = "translateY("+ windowHeight + "px)";
+		    	pages[next].style.webkitTransform = "translateY(" + windowHeight + "px)";
 		    	pages[prev].style.webkitTransform = "translateY(" + -windowHeight + "px)";
+
+		    	// // 加上过渡
+		    	// pages[idx].style.transition = "all 0.3s ease 0s";
+	      //     	pages[next].style.transition = "all 0.3s ease 0s";
+	      //     	pages[prev].style.transition = "all 0.3s ease 0s";
+
 		    }
 
 		}
