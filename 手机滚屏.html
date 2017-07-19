@@ -43,7 +43,6 @@
 
 	<script>
 		window.onload = function() {
-			// 得到轮播图里面的li
 			var main = document.querySelector('.main');
 	    	var pages = document.querySelectorAll('.main div');
 	    	console.log(pages);
@@ -60,13 +59,13 @@
 	    	function init() {
 	    		windowHeight = document.documentElement.clientHeight;
 	    		for (var i = 0; i < pages.length; i++) {
-	    			pages[i].style.webkitTransform = "translateY(" + windowHeight + "px)";
+	    			pages[i].style.webkitTransform = "translateY(" + -windowHeight + "px)";
 	    		}
 
 	    		// 新的位置
-	    		pages[prev].style.webkitTransform = "translateY(" + -windowHeight + "px)";
+	    		pages[prev].style.webkitTransform = "translateY(" + windowHeight + "px)";
 	    		pages[idx].style.webkitTransform = "translateY(0px)";
-	    		pages[next].style.webkitTransform = "translateY(" + windowHeight + "px)";
+	    		pages[next].style.webkitTransform = "translateY(" + -windowHeight + "px)";
 
 	    		// 去掉过渡，移动的时候我们希望实时跟随鼠标，而不是有过渡效果
 	    		pages[prev].style.transition = "none";
