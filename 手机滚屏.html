@@ -59,18 +59,11 @@
 	    	function init() {
 	    		windowHeight = document.documentElement.clientHeight;
 	    		for (var i = 0; i < pages.length; i++) {
-	    			pages[i].style.webkitTransform = "translateY(" + -windowHeight + "px)";
+	    			pages[i].style.webkitTransform = "translateY(" + windowHeight + "px)";
 	    		}
 
 	    		// 新的位置
-	    		pages[prev].style.webkitTransform = "translateY(" + windowHeight + "px)";
-	    		pages[idx].style.webkitTransform = "translateY(0px)";
-	    		pages[next].style.webkitTransform = "translateY(" + -windowHeight + "px)";
-
-	    		// 去掉过渡，移动的时候我们希望实时跟随鼠标，而不是有过渡效果
-	    		pages[prev].style.transition = "none";
-	    		pages[idx].style.transition = "none";
-	    		pages[next].style.transition = "none";
+	    		changepages();
 
 	    	}
 
@@ -87,13 +80,7 @@
 		        if (event.touches.length > 1) return;
 
 		        // 记录偏移值
-		        deltaY = event.touches[0].clientY;
 		        startY = event.touches[0].clientY;
-
-		        // 去掉过渡效果
-		        pages[prev].style.transition = "none";
-		        pages[idx].style.transition = "none";
-		        pages[next].style.transition = "none";
 
 
 		        // 记录时间
@@ -109,11 +96,12 @@
 
 		        // 得到坐标X
 		        var clientY = event.touches[0].clientY;
+		        console.log(clientY - startY);
 
 		        // 改变图片的位置
-		        pages[idx].style.webkitTransform = "translateY(" + (clientY - deltaY) + "px)";
-		        pages[next].style.webkitTransform = "translateY(" + (windowHeight + (clientY - deltaY)) + "px)";
-		        pages[prev].style.webkitTransform = "translateY(" + (-windowHeight+ (clientY - deltaY)) + "px)";
+		        pages[idx].style.webkitTransform = "translateY(" + (clientY - startY) + "px)";
+		        pages[next].style.webkitTransform = "translateY(" + (windowHeight + (clientY - startY)) + "px)";
+		        pages[prev].style.webkitTransform = "translateY(" + (-windowHeight + (clientY - startY)) + "px)";
 		    }
 
 
@@ -127,45 +115,31 @@
 				//滑动的时间
 		        var time = new Date() - startTime;
 
-		        //如果你向右边滑动超过了屏幕的一半，或者向右滑动时间小于300毫秒，距离大于30px则认为滑动成功
+		        //如果你向下边滑动超过了屏幕的一半，或者向下滑动时间小于300毫秒，距离大于30px则认为滑动成功
 		        if (distance >= windowHeight / 2 || (distance > 30 && time < 300)) {
-		        	//向右滑动成功
-		        	console.log(distance);
-	          		console.log('向下滑动成功');
-	          		//先改变信号量
-
-	          		next = idx;
-	          		idx = prev;
-	          		prev--;
-	          		if (prev < 0) {
-	          			prev = pages.length - 1;
-	          		}
-
-	          		//加上过渡
-	          		pages[idx].style.transition = "all 0.3s ease 0s";
-	          		pages[next].style.transition = "all 0.3 ease 0s";
-
-	          		// 移动
-	          		pages[idx].style.webkitTransform = "translateY(0px)";
-	          		pages[next].style.webkitTransform = "translateY(" + windowHeight + "px)";
+		        	showPrev();
 		        } else if (distance <= -windowHeight / 2 || (distance < -30 && time < 300)) {
 		        	showNext();
 		        } else {
-		        	//绝对值不到windowWidth/2
+		        	//绝对值不到windowHeight/2
 		        	console.log('不成功');
 
-		        	//加上过渡
-		        	pages[prev].style.transition = "all 0.3s ease 0s";
-		        	pages[idx].style.transition = "all 0.3s ease 0s";
-		        	pages[next].style.transition = "all 0.3s ease 0s";
-
-		        	// 移动
-		        	pages[prev].style.webkitTransform = "translateY(" + -windowHeight + "px)";
-		        	pages[idx].style.webkitTransform = "translateY(0px)";
-		        	pages[next].style.webkitTransform = "translateY(" + windowHeight + "px)";
+		        	changepages();
 		        }
 		    }
 
+			function showPrev() {
+				console.log("向下滑动成功");
+				// 先改变信号量
+				next = idx;
+				idx = prev;
+				prev--;
+				if (prev < 0) {
+					prev = pages.length - 1;
+				}
+
+				changepages();
+			}
 		    function showNext() {
 		    	console.log("向上滑动成功");
 		    	// 先改变信号量
@@ -176,17 +150,22 @@
 		    		next = 0;
 		    	}
 
-		    	pages[prev].style.transition = "none";
-		    	pages[prev].style.webkitTransform = "translateY(" + windowHeight + "px)";
-		    	
-		    	// 加上过渡
-		    	pages[next].style.transition = "all 0.3s ease 0s";
-		    	pages[idx].style.transition = "all 0.3s ease 0s";
-		    	
-		    	// 移动
-		    	pages[next].style.webkitTransform = "translateY(" + -windowHeight + "px)";
-		    	pages[idx].style.webkitTransform = "translateY(0px)";
+		    	changepages();
 
+		    }
+
+
+		    function changepages() {
+
+		    	// 加上过渡
+		    	pages[idx].style.transition = "all 0.3s ease 0s";
+				pages[next].style.transition = "all 0.3 ease 0s";
+	          	pages[prev].style.transition = "all 0.3 ease 0s";
+
+	          	// 移动
+		    	pages[idx].style.webkitTransform = "translateY(0px)";
+		    	pages[next].style.webkitTransform = "translateY("+ windowHeight + "px)";
+		    	pages[prev].style.webkitTransform = "translateY(" + -windowHeight + "px)";
 		    }
 
 		}
