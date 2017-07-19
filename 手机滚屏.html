@@ -133,6 +133,11 @@
 		        	//绝对值不到windowHeight/2
 		        	console.log('不成功');
 
+		        	// 加上过渡
+			    	pages[idx].style.transition = "all 0.3s ease 0s";
+					pages[prev].style.transition = "all 0.3s ease 0s";
+					pages[next].style.transition = "all 0.3s ease 0s";
+
 		        	// 移动
 			    	pages[idx].style.webkitTransform = "translateY(0px)";
 			    	pages[next].style.webkitTransform = "translateY("+ windowHeight + "px)";
